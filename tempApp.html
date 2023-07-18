@@ -26,21 +26,45 @@
 
 		<h1>Temperature Converter</h1>
 
-		<label for="temp">Enter  Your Temperature in F:</label>
+		<label for="temp">Enter Temperature</label>
 		<input type="text" id="temp">
+        
+        <label>
+			<input type="radio" name="units" value="celsius" > To Celsius
+		</label>
+
+		<label>
+			<input type="radio" name="units" value="fahrenheit" checked> To Fahrenheit
+		</label>
 
 		<div id="result" aria-live="polite"></div>
 
 
 		<script>
 			// Code goes here...
-            document.addEventListener('input', (e) => {
-                if (e.target.matches('#temp')) {
-                    const result = document.getElementById('result');
-                    let tempInCelsius = (parseFloat(e.target.value) - 32) * 5 / 9;
-                    tempInCelsius = tempInCelsius.toFixed(1);
-                    result.textContent = `${tempInCelsius} C`;
+            const radio = document.querySelector('[name="units"]:checked');
+            const units = radio.value;
+            
+            const temp = document.getElementById('temp');
+            const result = document.getElementById('result');
+            
+            temp.addEventListener('input', () => {
+                let output;
+
+                if (!temp.value || isNaN(temp.value)) {
+                    output = 0;
+                } else {
+                    const tempInput = parseFloat(temp.value);
+
+                    if (units === 'celsius') {
+                        output = (tempInput - 32) * 5 / 9;
+                    }
+                    if (units === 'fahrenheit') {
+                        output = (tempInput * 9 / 5) + 32;
+                    }
                 }
+                
+                result.textContent = `${output.toFixed(1)} degrees ${units[0].toUpperCase() + units.slice(1)}`;
             });
 		</script>
 	</body>
