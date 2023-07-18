@@ -24,9 +24,9 @@
 
 	<body>
 
-		<h1>Mirror Text</h1>
+		<h1>Temperature Converter</h1>
 
-		<label for="temp">Enter Text</label>
+		<label for="temp">Enter  Your Temperature in F:</label>
 		<input type="text" id="temp">
 
 		<div id="result" aria-live="polite"></div>
@@ -37,7 +37,9 @@
             document.addEventListener('input', (e) => {
                 if (e.target.matches('#temp')) {
                     const result = document.getElementById('result');
-                    result.textContent = e.target.value;
+                    let tempInCelsius = (parseFloat(e.target.value) - 32) * 5 / 9;
+                    tempInCelsius = tempInCelsius.toFixed(1);
+                    result.textContent = `${tempInCelsius} C`;
                 }
             });
 		</script>
