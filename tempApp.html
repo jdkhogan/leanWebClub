@@ -42,30 +42,30 @@
 
 		<script>
 			// Code goes here...
-            const radio = document.querySelector('[name="units"]:checked');
-            const units = radio.value;
-            
-            const temp = document.getElementById('temp');
-            const result = document.getElementById('result');
-            
-            temp.addEventListener('input', () => {
-                let output;
+            function getUnits() {
+                const radio = document.querySelector('[name="units"]:checked');
+                return radio.value;
+            }
 
-                if (!temp.value || isNaN(temp.value)) {
-                    output = 0;
-                } else {
-                    const tempInput = parseFloat(temp.value);
-
-                    if (units === 'celsius') {
-                        output = (tempInput - 32) * 5 / 9;
-                    }
-                    if (units === 'fahrenheit') {
-                        output = (tempInput * 9 / 5) + 32;
-                    }
+            function convertTemp(temperature, units) {
+                if (!temperature || isNaN(temperature)) return 0;
+                if (units === 'celsius') {
+                    return (parseFloat(temperature) - 32) * 5 / 9;
                 }
-                
-                result.textContent = `${output.toFixed(1)} degrees ${units[0].toUpperCase() + units.slice(1)}`;
-            });
+                if (units === 'fahrenheit') {
+                    return (parseFloat(temperature) * 9 / 5) + 32;
+                }
+                return "Error: unit not selected."
+            }
+
+            function handleInput() {
+                const temp = document.getElementById('temp');
+                const result = document.getElementById('result');
+                let units = getUnits();
+
+                result.textContent = `${convertTemp(temp.value, units).toFixed(1)} degrees ${units[0].toUpperCase() + units.slice(1)}`;
+            } 
+            temp.addEventListener('input', handleInput);
 		</script>
 	</body>
 </html>
