@@ -58,14 +58,17 @@
                 return "Error: unit not selected."
             }
 
-            function handleInput() {
-                const temp = document.getElementById('temp');
-                const result = document.getElementById('result');
-                let units = getUnits();
-
-                result.textContent = `${convertTemp(temp.value, units).toFixed(1)} degrees ${units[0].toUpperCase() + units.slice(1)}`;
+            function handleInputs(e) {
+                if (e.target.matches('#temp') || e.target.matches('[name="units"]')) {
+                    const temp = document.getElementById('temp');
+                    const result = document.getElementById('result');
+                    let units = getUnits();
+                    
+                    result.textContent = `${convertTemp(temp.value, units).toFixed(1)} degrees ${units[0].toUpperCase() + units.slice(1)}`;
+                }
             } 
-            temp.addEventListener('input', handleInput);
+
+            document.addEventListener('input', handleInputs);
 		</script>
 	</body>
 </html>
