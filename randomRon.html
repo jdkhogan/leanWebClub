@@ -17,7 +17,9 @@
 
 		<h1>Random Ron</h1>
 
-		<blockquote id="quote" aria-live="polite"><em>Getting a fresh quote...</em></blockquote>
+		<blockquote id="quote" aria-live="polite">
+            <em>Getting a fresh quote...</em>
+        </blockquote>
 
 		<p>
 			<button id="get-quote">More Ron</button>
@@ -29,16 +31,27 @@
             const apiURL = 'https://ron-swanson-quotes.herokuapp.com/v2/quotes';
             const ronBtn = document.getElementById('get-quote');
             const quote = document.getElementById('quote');
-           
+            const quotes = [];
 
             function getQuote() {
-                fetch(apiURL).then(
-                    res => res.ok ? res.json() : Promise.reject(res))
-                .then(
-                    data => quote.textContent = data[0])
-                .catch( 
-                    err => console.warn('something went wrong.', err)
-                );
+                fetch(apiURL).then(function (res) {
+                    return res.ok ? res.json() : Promise.reject(res);
+                }).then( function (data) {
+                    const newQuote = data[0];
+
+                    if (quotes.includes(newQuote)) {
+                        getQuote();
+                        return;
+                    }
+                    
+                    quote.textContent = newQuote;
+                    quotes.push(newQuote);
+
+                    if (quotes.length > 50) quotes.shift();
+                    
+                }).catch( function (err) {
+                    console.warn('something went wrong.', err);
+                });
             }
 
             getQuote();
