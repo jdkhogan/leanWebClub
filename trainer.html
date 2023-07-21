@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dragon Trainer Monthly</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<style type="text/css">
+			body {
+				margin: 0 auto;
+				max-width: 40em;
+				width: 88%;
+			}
+            .article {
+                margin-bottom: 2rem;
+            }
+            h3.title {
+                margin: 0;
+            }
+            .byline {
+                margin-top: 0.5rem;
+            }
+            .author {
+                font-weight: 600;
+                margin-right: 0.5rem;
+            }
+            .pubdate {
+                font-size: 0.875rem;
+                font-style: italic;
+            }
+		</style>
+	</head>
+	<body>
+
+		<h1>Dragon Trainer Monthly</h1>
+
+		<div id="app"></div>
+
+		<script>
+            function getArticles() {
+                const API_URL = 'https://vanillajsacademy.com/api/dragons.json';
+                const app = document.getElementById('app');
+
+                fetch(API_URL).then(function (res) {
+                    return res.ok ? res.json() : Promise.reject(res);
+                }).then( function (data) {
+                    if (!data) throw 'no data.';
+                    renderArticles(data.articles, app);
+                }).catch( function (err) {
+                    console.warn('something went wrong.', err);
+                });
+            }
+
+            function renderArticles(articles, el) {
+                if (!articles || articles.length == 0) {
+                    errMsg = 'Error: no articles found.'
+                    console.log(errMsg);
+                    el.innerHTML = errMsg;
+                    return;
+                }
+
+                el.innerHTML = articles.sort((a,b) => new Date(b.pubdate) - new Date(a.pubdate))
+                    .map(article => {
+                        return `<div class="article">
+                            <a href="${article.url}"><h3 class="title">${article.title}</h3></a>
+                            <div class="byline">
+                                <div class="author">by ${article.author}</div>
+                                <div class="pubdate">${article.pubdate}</div>
+                            </div>
+                            <p class="article">${article.article}</p>
+                        </div>`;
+                    }).join('');
+            }
+
+            getArticles();
+		</script>
+        
+	</body>
+    
