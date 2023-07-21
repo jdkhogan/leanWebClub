@@ -45,20 +45,25 @@
                     return res.ok ? res.json() : Promise.reject(res);
                 }).then( function (data) {
                     if (!data) throw 'no data.';
-                    renderArticles(data.articles, app);
+                    render(data.articles, app);
                 }).catch( function (err) {
                     console.warn('something went wrong.', err);
                 });
             }
 
-            function renderArticles(articles, el) {
+            /*  
+            ** Render articles into the DOM
+            ** @param {Array} articles The articles to render
+            ** @param {Node} el The element to render articles within
+            */
+            function render(articles, el) {
                 if (!articles || articles.length == 0) {
                     errMsg = 'Error: no articles found.'
                     console.log(errMsg);
                     el.innerHTML = errMsg;
                     return;
                 }
-
+                // sort by date, then add to element
                 el.innerHTML = articles.sort((a,b) => new Date(b.pubdate) - new Date(a.pubdate))
                     .map(article => {
                         return `<div class="article">
