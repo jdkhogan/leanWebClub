@@ -54,8 +54,35 @@
                 });
             }
 
-            getQuote();
-            ronBtn.addEventListener('click', getQuote);
+            async function asyncGetQuote() {
+                try {
+                    let res = await fetch(apiURL)
+                    if (!res.ok) throw res.status;
+
+                    let data = await res.json();
+                    if (!data) throw 'No data.';
+
+                    const newQuote = data[0];
+                    if (quotes.includes(newQuote)) {
+                        asyncGetQuote();
+                        return;
+                    }
+                    
+                    quote.textContent = newQuote;
+                    quotes.push(newQuote);
+
+                    if (quotes.length > 50) quotes.shift();
+                    
+                } catch {
+                    console.warn(error);
+                }
+            }
+
+            // getQuote();
+            // ronBtn.addEventListener('click', getQuote);
+
+            asyncGetQuote();
+            ronBtn.addEventListener('click', asyncGetQuote);
 		</script>
 	</body>
 </html>
