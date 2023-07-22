@@ -24,7 +24,7 @@
                 font-weight: 600;
                 margin-right: 0.5rem;
             }
-            .pubdate {
+            .pubdate, .bio {
                 font-size: 0.875rem;
                 font-style: italic;
             }
@@ -38,14 +38,25 @@
 
 		<script>
             function getArticles() {
-                const API_URL = 'https://vanillajsacademy.com/api/dragons.json';
+                const DRAGONS_URL = 'https://vanillajsacademy.com/api/dragons.json';
+                const AUTHORS_URL = 'https://vanillajsacademy.com/api/dragons-authors.json';
                 const app = document.getElementById('app');
 
-                fetch(API_URL).then(function (res) {
-                    return res.ok ? res.json() : Promise.reject(res);
+                Promise.all([
+                    fetch(DRAGONS_URL), 
+                    fetch(AUTHORS_URL)
+                ]).then(function (responses) {
+                    return Promise.all(
+                        responses.map( response => response.json() )
+                    );
                 }).then( function (data) {
                     if (!data) throw 'no data.';
-                    render(data.articles, app);
+                    
+                    const articles = data[0].articles;
+                    const authors = data[1].authors;
+                    
+                    render(articles, authors, app);
+
                 }).catch( function (err) {
                     console.warn('something went wrong.', err);
                 });
@@ -54,9 +65,10 @@
             /*  
             ** Render articles into the DOM
             ** @param {Array} articles The articles to render
+            ** @param {Array} authors The authors of the articles
             ** @param {Node} el The element to render articles within
             */
-            function render(articles, el) {
+            function render(articles, authors, el) {
                 if (!articles || articles.length == 0) {
                     errMsg = 'Error: no articles found.'
                     console.log(errMsg);
@@ -66,14 +78,19 @@
                 // sort by date, then add to element
                 el.innerHTML = articles.sort((a,b) => new Date(b.pubdate) - new Date(a.pubdate))
                     .map(article => {
+                        const author = authors.find(function (item) {
+                            return item.author === article.author;
+                        }); 
+                        
                         return `<div class="article">
                             <a href="${article.url}"><h3 class="title">${article.title}</h3></a>
                             <div class="byline">
                                 <div class="author">by ${article.author}</div>
                                 <div class="pubdate">${article.pubdate}</div>
                             </div>
-                            <p class="article">${article.article}</p>
-                        </div>`;
+                            <p class="content">${article.article}</p>`
+                            + `${author.bio ? '<p class="bio">' + author.bio + '</p>' : ''}`
+                        + `</div>`;
                     }).join('');
             }
 
