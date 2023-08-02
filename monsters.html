@@ -134,10 +134,11 @@
 
 			// Your code goes here...
             function initMonsters(arr, board) {
-                const output = shuffle(arr).map(
+                shuffle(arr);
+                const output = arr.map(
                     (monster, i) => {
-                        return `<div class="grid door" id="${monster.name}">
-                            <button><img src="/monsters/door.svg" alt="Door ${i + 1}"></button>
+                        return `<div class="grid" aria-live="polite">
+                            <button data-monster="${i}"><img src="/monsters/door.svg" alt="Door ${i + 1}"></button>
                             </div>`;
                     }
                 ).join('');
@@ -148,21 +149,16 @@
             function handleClick(arr, board) {
                 document.addEventListener("click", function(e) {
                     const item = e.target;
-                    const parent = item.parentElement;
+                    const parent = item.closest('button');
+                    if (!parent) return;
+                    const monster = arr[parent.getAttribute('data-monster')];
                     
-                    if (!parent || parent.classList === null) return;
-                    if (!parent.classList.contains('door') && !parent.classList.contains('monster')) return;
+                    let img = document.createElement('img');
+                    img.src = `/monsters/${monster.name}.svg`;
+                    img.alt = monster.name === 'socks' ? 'Socks' : `Monster ${monster.name.slice(-1)}`;
 
-                    if (parent.classList.contains('door')) {
-                        const monster = parent.id;
-                        item.src = `/monsters/${monster}.svg`;
-                        if (monster == 'socks') parent.classList.add('socks');
-                    }
-                    if (parent.classList.contains('monster')) {
-                        item.src = '/monsters/door.svg';
-                    }
-                    parent.classList.toggle('door');
-                    parent.classList.toggle('monster');
+                    parent.replaceWith(img);
+                    
                     scoreGame(arr, board);
                 });
             }
@@ -172,7 +168,7 @@
                 
                 const scoreArr = Array.prototype.map.call(monsters, monster => {
                     if (monster.querySelector('img').src.includes('door')) return 0;
-                    if (monster.classList.contains('socks')) return -1;
+                    if (monster.querySelector('img').src.includes('socks')) return -1;
                     if (monster.querySelector('img').src.includes('monster')) return 1;
                 });
                 
@@ -182,19 +178,22 @@
                     return msg;
                 }
 
-                if (scoreArr.includes(-1)) {
-                    board.parentElement.prepend(createMsg('you lose'));
+                function endGame(msg) {
+                    board.style.visibility = 'hidden';
+                    board.parentElement.prepend(createMsg(msg));
+
                     setTimeout(() => {
                         board.parentElement.querySelector('h2').remove();
                         initMonsters(arr, board);
+                        board.style.visibility = 'visible';
                     }, 3000);
                 }
+
+                if (scoreArr.includes(-1)) {
+                    endGame('you lose');
+                }
                 if (scoreArr.reduce((acc, cur) => acc + cur) == scoreArr.length - 1) {
-                    board.parentElement.prepend(createMsg('You win!'));
-                    setTimeout(() => {
-                        board.parentElement.querySelector('h2').remove();
-                        initMonsters(arr, board);
-                    }, 3000);
+                    endGame('You win!');
                 }
             }
 
