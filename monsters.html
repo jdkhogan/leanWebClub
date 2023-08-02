@@ -26,19 +26,22 @@
 				padding: 1em;
 			}
 
-			/**
-			 * Make sure images scale
-			 */
+            button {
+                background-color: unset;
+                border: 0;
+            }
+
 			img {
 				height: auto;
-				max-width: 100%;
+				width: 100%;
 			}
 		</style>
 	</head>
 	<body>
 
 		<h1>Monsters!</h1>
-		<h3>Click to see who's hiding behind each door.</h3>
+		<h3>Click to see who's hiding behind each door. Reveal all monsters to win! </h3>
+		<h3>But if you find the socks, it's game over.</h3>
 
 		<div id="app">
             <div class="row">
@@ -132,8 +135,10 @@
 			// Your code goes here...
             function initMonsters(arr, board) {
                 const output = shuffle(arr).map(
-                    monster => {
-                        return `<div class="grid door" id="${monster.name}"><img src="/monsters/door.svg" alt="A closed door"></div>`;
+                    (monster, i) => {
+                        return `<div class="grid door" id="${monster.name}">
+                            <button><img src="/monsters/door.svg" alt="Door ${i + 1}"></button>
+                            </div>`;
                     }
                 ).join('');
                 
