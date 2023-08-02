@@ -130,35 +130,78 @@
 			];
 
 			// Your code goes here...
-            function initMonsters(arr, target) {
-                const row = document.querySelector(target);
+            function initMonsters(arr, board) {
                 const output = shuffle(arr).map(
                     monster => {
                         return `<div class="grid door" id="${monster.name}"><img src="/monsters/door.svg" alt="A closed door"></div>`;
                     }
                 ).join('');
                 
-                row.innerHTML = output;
+                board.innerHTML = output;
+            }
 
+            function handleClick(arr, board) {
                 document.addEventListener("click", function(e) {
                     const item = e.target;
                     const parent = item.parentElement;
-
+                    
+                    if (!parent || parent.classList === null) return;
                     if (!parent.classList.contains('door') && !parent.classList.contains('monster')) return;
 
                     if (parent.classList.contains('door')) {
                         const monster = parent.id;
                         item.src = `/monsters/${monster}.svg`;
+                        if (monster == 'socks') parent.classList.add('socks');
                     }
                     if (parent.classList.contains('monster')) {
                         item.src = '/monsters/door.svg';
                     }
                     parent.classList.toggle('door');
                     parent.classList.toggle('monster');
+                    scoreGame(arr, board);
                 });
             }
 
-            initMonsters(monsters, '#app .row');
+            function scoreGame(arr, board) {
+                const monsters = board.childNodes;
+                
+                const scoreArr = Array.prototype.map.call(monsters, monster => {
+                    if (monster.querySelector('img').src.includes('door')) return 0;
+                    if (monster.classList.contains('socks')) return -1;
+                    if (monster.querySelector('img').src.includes('monster')) return 1;
+                });
+                
+                function createMsg(str) {
+                    let msg = document.createElement('h2');
+                    msg.append(str);
+                    return msg;
+                }
+
+                if (scoreArr.includes(-1)) {
+                    board.parentElement.prepend(createMsg('you lose'));
+                    setTimeout(() => {
+                        board.parentElement.querySelector('h2').remove();
+                        initMonsters(arr, board);
+                    }, 3000);
+                }
+                if (scoreArr.reduce((acc, cur) => acc + cur) == scoreArr.length - 1) {
+                    board.parentElement.prepend(createMsg('You win!'));
+                    setTimeout(() => {
+                        board.parentElement.querySelector('h2').remove();
+                        initMonsters(arr, board);
+                    }, 3000);
+                }
+            }
+
+            function runGame(arr, target) {
+                const board = document.querySelector(target);
+
+                initMonsters(arr, board);
+                handleClick(arr,board);
+                
+            }
+
+            runGame(monsters, '#app .row');
 		</script>
 	</body>
 </html>
