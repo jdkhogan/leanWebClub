@@ -35,6 +35,20 @@
 				height: auto;
 				width: 100%;
 			}
+
+            a.btn {
+                text-decoration: none;
+                background-color: purple;
+                color: white;
+                border: 2px solid purple;
+                padding: 8px 12px;
+                transition: all 0.3s;
+            }
+            a.btn:hover {
+                text-decoration: none;
+                background-color: white;
+                color: purple;
+            }
 		</style>
 	</head>
 	<body>
@@ -133,79 +147,65 @@
 			];
 
 			// Your code goes here...
-            function initMonsters(arr, board) {
-                shuffle(arr);
-                const output = arr.map(
-                    (monster, i) => {
-                        return `<div class="grid" aria-live="polite">
-                            <button data-monster="${i}"><img src="/monsters/door.svg" alt="Door ${i + 1}"></button>
-                            </div>`;
-                    }
-                ).join('');
-                
-                board.innerHTML = output;
-            }
+            function handleClick(e) {
+                const parent = e.target.closest('button');
+                if (!parent) return;
 
-            function handleClick(arr, board) {
-                document.addEventListener("click", function(e) {
-                    const item = e.target;
-                    const parent = item.closest('button');
-                    if (!parent) return;
-                    const monster = arr[parent.getAttribute('data-monster')];
-                    
-                    let img = document.createElement('img');
-                    img.src = `/monsters/${monster.name}.svg`;
-                    img.alt = monster.name === 'socks' ? 'Socks' : `Monster ${monster.name.slice(-1)}`;
+                const monster = monsters[parent.getAttribute('data-monster')];
+                if (!monster) return;
 
-                    parent.replaceWith(img);
-                    
-                    scoreGame(arr, board);
-                });
-            }
-
-            function scoreGame(arr, board) {
-                const monsters = board.childNodes;
-                
-                const scoreArr = Array.prototype.map.call(monsters, monster => {
-                    if (monster.querySelector('img').src.includes('door')) return 0;
-                    if (monster.querySelector('img').src.includes('socks')) return -1;
-                    if (monster.querySelector('img').src.includes('monster')) return 1;
-                });
-                
-                function createMsg(str) {
-                    let msg = document.createElement('h2');
-                    msg.append(str);
-                    return msg;
+                if (monster.name === 'socks') {
+                    endGame('you lose!');
+                    return;
                 }
+                
+                let img = document.createElement('img');
+                img.src = `/monsters/${monster.name}.svg`;
+                img.alt = monster.alt;
 
-                function endGame(msg) {
-                    board.style.visibility = 'hidden';
-                    board.parentElement.prepend(createMsg(msg));
-
-                    setTimeout(() => {
-                        board.parentElement.querySelector('h2').remove();
-                        initMonsters(arr, board);
-                        board.style.visibility = 'visible';
-                    }, 3000);
-                }
-
-                if (scoreArr.includes(-1)) {
-                    endGame('you lose');
-                }
-                if (scoreArr.reduce((acc, cur) => acc + cur) == scoreArr.length - 1) {
+                parent.replaceWith(img);
+                
+                found++;
+                if (found == monsters.length - 1) {
                     endGame('You win!');
                 }
             }
 
-            function runGame(arr, target) {
-                const board = document.querySelector(target);
-
-                initMonsters(arr, board);
-                handleClick(arr,board);
+            function endGame(msg) {
+                found = 0;
+                board.style.visibility = 'hidden';
+                board.parentElement.prepend(createEl('h2', msg));
                 
+                setTimeout(() => {
+                    board.parentElement.querySelector('h2').remove();
+                    const btn = createEl('a', 'Start New Game');
+                    btn.classList.add('btn');
+                    btn.href = 'monsters.html';
+                    board.parentElement.prepend(btn);
+                }, 3000);
             }
+            
+            function createEl(el, str) {
+                let output = document.createElement(el);
+                output.append(str);
+                return output;
+            }
+            
+            let found = 0;
+            
+            shuffle(monsters);
+            
+            const board = document.querySelector('#app .row');
+            board.innerHTML = monsters.map(
+                (monster, i) => {
+                    return `<div class="grid" aria-live="polite">
+                        <button data-monster="${i}"><img src="/monsters/door.svg" alt="Door ${i + 1}"></button>
+                        </div>`;
+                }
+            ).join('');
+            board.style.visibility = 'visible';
+            document.addEventListener('click', handleClick);
 
-            runGame(monsters, '#app .row');
 		</script>
 	</body>
 </html>
