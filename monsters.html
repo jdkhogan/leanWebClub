@@ -56,6 +56,7 @@
 		<h1>Monsters!</h1>
 		<h3>Click to see who's hiding behind each door. Reveal all monsters to win! </h3>
 		<h3>But if you find the socks, it's game over.</h3>
+        <h4>You've found <span class="monster-qty">0 monsters</span>.</h4>
 
 		<div id="app">
             <div class="row">
@@ -166,16 +167,22 @@
                 parent.replaceWith(img);
                 
                 found++;
+                monsterQty.textContent = found === 1 
+                    ? found + ' monster' 
+                    : found + ' monsters';
+
                 if (found == monsters.length - 1) {
                     endGame('You win!');
                 }
             }
 
             function endGame(msg) {
+                monsterQty.parentElement.innerHTML = `You found ${found === 1 ? "1 monster" : found + ' monsters'}.`;
                 found = 0;
                 board.style.visibility = 'hidden';
                 board.parentElement.prepend(createEl('h2', msg));
                 
+                // resets game
                 setTimeout(() => {
                     board.parentElement.querySelector('h2').remove();
                     const btn = createEl('a', 'Start New Game');
@@ -191,11 +198,14 @@
                 return output;
             }
             
+            // Init game
             let found = 0;
             
             shuffle(monsters);
             
             const board = document.querySelector('#app .row');
+            const monsterQty = document.querySelector('.monster-qty');
+
             board.innerHTML = monsters.map(
                 (monster, i) => {
                     return `<div class="grid" aria-live="polite">
