@@ -27,54 +27,70 @@
 <body>
 	<h1>Form Autosave</h1>
     <form id="save-me">
-
         <label for="name">Name</label>
         <input type="text" name="name" id="name">
 
         <label for="address">Address</label>
-        <input type="text" id="address">
+        <input type="text" name="address" id="address">
 
         <label for="email">Email</label>
-        <input type="email" id="email">
+        <input type="email" name="email" id="email">
 
         <label for="more">Additional thoughts?</label>
         <textarea name="more" id="more"></textarea>
 
         <button type="submit">Submit</button>
-
     </form>
 </body>
 
 <script>
-    const form = document.getElementById('save-me');
-    const fields = form.elements;
+    const prefix = 'autosave_';
     
+    const form = document.getElementById('save-me');
+    let data = new FormData(form);
+    let obj = serialize(data);
+    let stringified = JSON.stringify(obj);
+    
+    
+    function serialize (data) {
+        let obj = {};
+        for (let [key, value] of data) {
+            if (obj[key] !== undefined) {
+                if (!Array.isArray(obj[key])) {
+                    obj[key] = [obj[key]];
+                }
+                obj[key].push(value);
+            } else {
+                obj[key] = value;
+            }
+        }
+        return obj;
+    }
+
     function loadSaved() {
-        for (let field of fields) {
-            let saved = localStorage.getItem(field.id);
-            if (!saved) continue; // exit loop if there is no saved value for this field
-            
-            document.getElementById(field.id).value = saved;
+        let obj = localStorage.getItem(prefix + 'items');
+        if (!obj) return; // exit if autosave_items does not exist in localStorage
+
+        let fields = JSON.parse(obj);
+        
+        for (let [key,val] of Object.entries(fields)) {
+            if (!val) continue; // exit loop if there is no saved value for this field
+         
+            form[key].value = val;
         }
     }
     
     function inputHandler(e) {
+        // only save the field if it has a name
         let field = e.target;
+        if (!field.name) return;
 
-        // only save the field if it has an id
-        if (!field.id) return;
-        
-        // remove field from storage rather than saving an empty string
-        if (!field.value) {
-            localStorage.removeItem(field.id);
-            return;
-        }
-
-        localStorage.setItem(field.id, field.value);
+        let obj = serialize(new FormData(form));
+        localStorage.setItem(prefix + 'items', JSON.stringify(obj));
     }
     
-    function clickHandler() {
-        fields.map(field => localStorage.removeItem(field.id));
+    function clickHandler(e) {
+        localStorage.removeItem(prefix + 'items');
     }
 
     loadSaved();
