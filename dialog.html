@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dialog HTML Element</title>
+
+    <style>
+        body {
+            background-color: #ba0bab;
+        }
+        dialog::backdrop {
+        	background-color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- <dialog class="d-one">
+        <p>Hey, don't do that!</p>
+        <form method="dialog">
+            <button>Ok, sorry!</button>
+        </form>
+    </dialog>
+    <button data-show-modal>Show Modal</button>
+    
+    <script>
+        let modalOne = document.querySelector('.d-one');
+        
+        // displays modal on page load, e.g. a cookies notification banner
+        // modalOne.showModal();
+        
+        // Below displays a button to control the modal
+        /* Get the button and modal
+        let btn = document.querySelector('[data-show-modal]');
+        Show the modal
+        btn.addEventListener('click', function () {
+            modalOne.showModal();
+        }); */
+    </script> -->
+
+
+    <!-- <dialog class="d-two">
+        <p>Are you <em>sure</em> you want to do that?</p>
+        <form method="dialog">
+            <button value="cancel">Cancel</button>
+            <button value="confirm">Confirm</button>
+        </form>
+    </dialog>
+    
+
+    <script>
+        let modalTwo = document.querySelector('.d-two');
+        modalTwo.showModal();
+        modalTwo.addEventListener('close', function (event) {
+            if (modalTwo.returnValue !== 'confirm') return;
+            console.log('Confirmed!');
+            // Do something...
+        });
+    </script> -->
+
+    <dialog class="d-three">
+        <p>Are you <em>sure</em> you want to do that?</p>
+        <form method="dialog">
+            <label for="confirmText">Type CONFIRM to continue</label>
+            <input type="text" id="confirmText" name="confirmText" oninput="this.form.elements.confirm.value=this.value;">
+            <button value="cancel">Cancel</button>
+            <button id="confirm" value="confirm">Submit</button>
+        </form>
+    </dialog>
+    
+
+    <script>
+        let modalThree = document.querySelector('.d-three');
+        modalThree.showModal();
+        modalThree.addEventListener('close', function (event) {
+            if (modalThree.returnValue === 'cancel') {
+                console.log('cancelled');
+                return;
+            }
+            if (modalThree.returnValue === 'CONFIRM') {
+                console.log('Confirmed - thank you.');
+            } else {
+                console.log('incorrect confirmation input: ' + modalThree.returnValue);
+                modalThree.showModal()
+            }
+        });
+    </script>
+
+    
+</body>
+</html>
