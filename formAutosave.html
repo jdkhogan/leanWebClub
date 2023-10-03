@@ -50,6 +50,7 @@
     let data = new FormData(form);
     let obj = serialize(data);
     let stringified = JSON.stringify(obj);
+    let debounce, currentNotification;
     
     
     function serialize (data) {
@@ -79,14 +80,38 @@
             form[key].value = val;
         }
     }
+
+    function showStatus () {
+        let notification = document.createElement('div');
+        notification.setAttribute('aria-live', 'polite');
+
+        form.append(notification);
+
+        setTimeout( function() { 
+            notification.textContent = 'Form information saved.';
+
+            if (currentNotification) currentNotification.remove();
+
+            currentNotification = notification;
+        }, 1);
+
+        setTimeout( function(){ 
+            notification.remove()
+        }, 3000);
+    }
     
     function inputHandler(e) {
-        // only save the field if it has a name
-        let field = e.target;
-        if (!field.name) return;
+        clearTimeout(debounce);
 
-        let obj = serialize(new FormData(form));
-        localStorage.setItem(prefix + 'items', JSON.stringify(obj));
+        debounce = setTimeout( function(){
+            // only save the field if it has a name
+            let field = e.target;
+            if (!field.name) return;
+    
+            let obj = serialize(new FormData(form));
+            localStorage.setItem(prefix + 'items', JSON.stringify(obj));
+            showStatus();
+        }, 1000);
     }
     
     function clickHandler(e) {
