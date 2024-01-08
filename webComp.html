@@ -1,0 +1,52 @@
+<body>
+    <greeting-msg></greeting-msg>
+    <greeting-msg>hello</greeting-msg>
+    <greeting-msg wave></greeting-msg>
+    <greeting-msg name="Merlin"></greeting-msg>
+
+    
+    <script>
+        class GreetingMsg extends HTMLElement {
+            constructor() {
+                super();
+                
+                let btnText = this.innerHTML.trim();
+                this.innerHTML = 
+                    `<p>
+                        <button>${this.hasAttribute('wave') ? '&#128075; ' : ''}${btnText ? btnText : "Hi there!"}</button>
+                    </p>
+                    <div class="message" aria-live="polite"></div>`;
+            }
+
+            clickHandler(e) {
+                let host = e.target.closest('greeting-msg');
+                
+                let target = host.querySelector('.message');
+                if (!target) return;
+                
+                let name = host.getAttribute('name');
+                target.textContent = `Hi there, ${name ?? 'friend'}. Hope you're having a great day!`;
+
+                setTimeout(() => target.textContent = '', 3000);
+            }
+
+            connectedCallback() {
+                let btn = this.querySelector('button');
+                if (!btn) return;
+
+                btn.addEventListener('click', this.clickHandler);
+            }
+
+            disconnectedCallback() {
+                console.log('disconnected', this);
+                
+                let btn = this.querySelector('button');
+                if (!btn) return;
+                btn.removeEventListener('click', this.clickHandler)
+            }
+        }
+        if ('customElements in window') {
+            customElements.define('greeting-msg', GreetingMsg);
+        }
+    </script>
+</body>
