@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Worker Practice</title>
+</head>
+<body>
+    <h1>Demoing a service worker</h1>
+    <p>Currently online!</p>
+    <p><img style="max-width: 100ch" alt="Diablo Lake in the North Cascade Mountains" src="img/diablo.jpg"></p>
+    <script>
+        if (navigator && navigator.serviceWorker) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>

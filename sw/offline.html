@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline!</title>
+</head>
+<body>
+    <h1>Uh oh!</h1>
+    <p>You're offline...</p>
+    <div id="offline-content"></div>
+    <script>
+        if (navigator && navigator.serviceWorker) {
+            navigator.serviceWorker.register('sw.js');
+            
+            caches.open('pages').then(cache => {
+                cache.keys().then(keys => {
+                    let offline = document.querySelector('#offline-content');
+
+                    // Inject a list of URLs into the DOM
+                    offline.innerHTML = `<ul>
+                        ${keys.map(key => {
+                            // If the item isn't an HTML file, skip to the next one
+                            // This is only needed if you're keeping everything in one cache
+                            if (!key.headers.get('Accept').includes('text/html') || key.url.includes('/offline')) return '';
+
+                            return `<li><a href="${key.url}">${key.url}</a></li>`;
+                        }).join('')}
+                    </ul>`;
+                });
+            });
+        }
+    </script>    
+</body>
+</html>
+
+
